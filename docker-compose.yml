@@ -1,0 +1,34 @@
+services:
+  kalkun:
+    container_name: kalkun
+    image: junyent/kalkun-gammu:latest
+    build:
+      context: ./
+      dockerfile: kalkun-gammu.dockerfile
+    restart: unless-stopped
+    network_mode: host
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    environment:
+      - TZ=Etc/UTC
+    depends_on:
+      - "kalkun-db"
+
+  kalkun-db:
+    container_name: kalkun-db
+    image: junyent/kalkun-mariadb:latest
+    build:
+      context: ./
+      dockerfile: kalkun-mariadb.dockerfile
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: kalkun 
+      MYSQL_DATABASE: kalkun 
+      MYSQL_USER: kalkun 
+      MYSQL_PASSWORD: kalkun 
+    volumes:
+      - ./data/mysql:/var/lib/mysql:Z 
